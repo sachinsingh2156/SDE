@@ -328,6 +328,10 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <div class="card top"><span class="tag">Architecture</span><h4>How well it will do it</h4><p>Which components, which back end, SQL or NoSQL, who talks to whom, containers or not, how it is deployed.</p><p><b>Good architecture gives you the quality attributes.</b></p><p><i>Building analogy:</i> how the walls make the room sound-proof and keep extreme weather outside.</p></div>
 </div>
 <div class="call"><span class="lab">Teacher's note</span>Do not chase the ideal system. Even very large, heavily funded public portals are not perfect at peak load. Our target is the <b>most appropriate</b> architecture for the situation, not a perfect one.</div>
+<div class="grid g2">
+<div class="card"><h4>Do I have to start from a reference architecture?</h4><p>No. It is your choice. But well-known architectures come with <b>known benefits and known side effects</b>, which is exactly why they are worth knowing before you invent your own.</p></div>
+<div class="card"><h4>Why this skill is valued</h4><p>A brain alone cannot keep a body alive; every organ must be in the right place and in sync. An AI model is the same: it needs a system around it. People who can make these decisions (solution architects) are among the best-paid roles in computing, and they get there through development experience plus architectural judgment.</p></div>
+</div>
 </section>
 
 <section class="topic"><h3><span>1.4</span>Requirements: functional, constraints, quality attributes</h3>
@@ -347,6 +351,7 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 </div>
 <h5>The "-ilities"</h5>
 <div class="chips"><span>Availability</span><span>Reliability</span><span>Performance</span><span>Scalability</span><span>Security</span><span>Maintainability</span><span>Modifiability</span><span>Extensibility</span><span>Flexibility</span><span>Fault tolerance</span><span>Reusability</span></div>
+<div class="call"><span class="lab">A standard vocabulary</span>The international standard <b>ISO/IEC 25010</b> organises software product quality into characteristics you can cite in answers: functional suitability, performance efficiency, compatibility, usability, reliability, security, maintainability and portability.</div>
 <p>Two products with the same functions (two mobile operating systems, two office suites, two cloud providers) are told apart by their quality attributes. That is what users call "a matter of choice".</p>
 <div class="grid g2">
 <div class="card top"><h4>Trade-offs are permanent</h4><ul><li><b>Security vs performance:</b> every extra layer of encryption, authentication, authorization and auditing slows the system. The most secure software tends to be the slowest.</li><li><b>Efficiency vs availability:</b> fewer components run faster, but when one fails everything attached to it fails.</li></ul><p>Everything you add has a side effect. Architecture is choosing which side effects you can accept.</p></div>
@@ -359,7 +364,7 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <p>We reduce complexity by splitting the system into independent units. Two words judge how good the split is.</p>
 <div class="grid g2">
 <div class="card top"><span class="tag">Inside a component</span><h4>High cohesion</h4><p>Everything inside the component belongs together and forms one logical unit. Give each component one responsibility (the single-responsibility idea from SOLID).</p></div>
-<div class="card top"><span class="tag">Between components</span><h4>Loose coupling</h4><p>A component depends as little as possible on others, and only through a <b>common interface</b>. Example: one <code>PaymentGateway</code> interface with several implementations, injected as needed (dependency injection).</p></div>
+<div class="card top"><span class="tag">Between components</span><h4>Loose coupling</h4><p>A component depends as little as possible on others, and only through a <b>common interface</b>. Example: one <code>PaymentGateway</code> interface with several implementations, injected as needed (dependency injection, a form of inversion of control).</p></div>
 </div>
 <div class="call think"><span class="lab">Think about it</span><b>"One responsibility per component: will that not be slow and create too many components?"</b> More components, yes, but each one is simple. And one responsibility does not mean one request at a time: an authentication component can authenticate millions of users concurrently if it is designed to scale.</div>
 <p>A <b>monolithic</b> system is the opposite extreme: one big module with high coupling and low cohesion, no separation of concerns, where a fault in any small piece of code can affect everything.</p>
@@ -405,7 +410,7 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <header class="ch-head"><div class="ch-num">02</div><div><p class="eyebrow">Unit 1 · The pattern catalogue</p><h2>Architectural Patterns</h2>
 <p class="lead">Reusable answers to problems that keep coming back. For each one, learn the idea, the price, and when it is the right choice.</p></div></header>
 <div class="learn"><b>By the end of this chapter you can</b><ul>
-<li>Define a pattern and explain "discovered, not invented"</li><li>Describe any pattern with the six-part template</li><li>Draw and compare ten common patterns</li><li>Separate monolithic, modular and microservice styles</li><li>Explain multi-tenancy with the email–chat–forum example</li><li>Justify one pattern over another for a use case</li></ul></div>
+<li>Define a pattern and explain "discovered, not invented"</li><li>Describe any pattern with the six-part template</li><li>Draw and compare the common patterns, from layered to map-reduce</li><li>Separate monolithic, modular and microservice styles</li><li>Explain multi-tenancy with the email–chat–forum example</li><li>Justify one pattern over another for a use case</li></ul></div>
 
 <section class="topic"><h3><span>2.1</span>What makes something a pattern?</h3>
 <p class="def">A pattern is a <b>known solution</b> to a <b>given problem</b> in a <b>particular context</b>.</p>
@@ -463,6 +468,19 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <div class="call"><span class="lab">Teacher's note</span>A pattern is about how the system is implemented. It promises nothing about your data's privacy or availability. Those are orthogonal concerns with their own patterns.</div>
 </div></article>
 
+<!-- MULTI-TIER -->
+<article class="pattern"><header><h4>Multi-tier</h4><span>Layers placed on separate groups of machines</span></header><div class="body">
+<figure class="fig"><div class="flow">
+<div class="step plain"><b>Client tier</b><small>browser or mobile app</small></div><span class="arr">⇄</span>
+<div class="step"><b>Web tier</b><small>web servers, behind a load balancer</small></div><span class="arr">⇄</span>
+<div class="step"><b>Application tier</b><small>business logic</small></div><span class="arr">⇄</span>
+<div class="step dark"><b>Data tier</b><small>databases and storage</small></div></div>
+<figcaption>A <b>layer</b> is a logical grouping of code. A <b>tier</b> is a run-time grouping that usually lives on its own machines.</figcaption></figure>
+<p class="use">In class we noted that each layer of a layered system can be deployed on a different machine, and that only the layer which becomes a bottleneck needs to be replicated. Doing exactly that gives the multi-tier pattern described in <i>Software Architecture in Practice</i>: the system's run-time components are grouped into tiers, and each tier is scaled, secured and maintained on its own.</p>
+<div class="pc"><div class="p"><h5>What you gain</h5><ul><li>Scale or replicate only the tier under load</li><li>Different security rules per tier (the data tier is never exposed to the Internet)</li><li>Tiers can be owned and upgraded by different teams</li></ul></div>
+<div class="c"><h5>What you pay</h5><ul><li>More machines, more cost and more to manage</li><li>Every request makes network hops between tiers</li><li>Putting all tiers on one machine saves money but returns you to a single point of failure</li></ul></div></div>
+</div></article>
+
 <!-- BROKER -->
 <article class="pattern"><header><h4>Broker</h4><span>An intermediary that connects clients to servers</span></header><div class="body">
 <figure class="fig"><svg viewBox="0 -16 640 246" role="img" aria-label="Clients reach servers through a broker">
@@ -488,6 +506,40 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <div class="pc"><div class="p"><h5>What you gain</h5><ul><li>Clients are independent of server addresses and count</li><li>Easy scaling, load balancing and failover to another server</li><li>A single place for access control</li></ul></div>
 <div class="c"><h5>What you pay</h5><ul><li>The broker can be a single point of failure or bottleneck</li><li>Any measurement or "smartness" is computational overhead</li><li>If strict ordering is required (ticketing, banking), brokers must be smart and scale suffers; a chat service that tolerates out-of-order delivery scales far more easily</li></ul></div></div>
 <p class="use"><b>Broker vs bus:</b> a bus lets servers talk to each other; a broker does not. <b>Broker vs master–slave:</b> a master controls what the slaves do; a broker only connects.</p>
+</div></article>
+
+<!-- MASTER-SLAVE -->
+<article class="pattern"><header><h4>Master–Slave</h4><span>One primary node controls the others</span></header><div class="body">
+<figure class="fig"><svg viewBox="0 0 640 210" role="img" aria-label="Clients send requests to a master which assigns work to slaves">
+<rect class="bx" x="20" y="82" width="110" height="44" rx="8"/><text class="tx" x="75" y="104">Clients</text>
+<rect class="bxa" x="235" y="70" width="150" height="68" rx="10"/><text class="txw" x="310" y="95">Master</text><text class="txw" x="310" y="114" style="font-weight:400;font-size:11.5px">decides and controls</text>
+<rect class="bxf" x="500" y="14" width="120" height="42" rx="8"/><text class="tx" x="560" y="35">Slave 1</text>
+<rect class="bxf" x="500" y="83" width="120" height="42" rx="8"/><text class="tx" x="560" y="104">Slave 2</text>
+<rect class="bxf" x="500" y="152" width="120" height="42" rx="8"/><text class="tx" x="560" y="173">Slave 3</text>
+<path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M132 104H233"/>
+<path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M387 90L498 40"/><path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M387 104H498"/><path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M387 118L498 168"/>
+<text class="txs" x="415" y="50">assign work</text><text class="txs" x="442" y="170">collect results</text>
+<text class="txs" x="182" y="92">all requests</text>
+</svg><figcaption>All requests go through the primary; the secondaries do what the master tells them and report back.</figcaption></figure>
+<p class="use">Among, say, ten or twelve servers there is one <b>primary</b>. Every request passes through it, and it decides what each <b>secondary</b> does. This is the key difference from a broker, which never controls its servers.</p>
+<div class="tw"><table><tr><th></th><th>Broker</th><th>Master–slave</th></tr>
+<tr><td>Role of the middle node</td><td>Introduces client and server, then steps aside</td><td>Controls the servers: divides work, assigns it, collects it</td></tr>
+<tr><td>Intelligence</td><td>Best kept dumb, for scale</td><td>Smart by definition</td></tr>
+<tr><td>A load balancer is…</td><td>…a broker, if it only spreads requests</td><td>…a master, once it decides which task goes to which node</td></tr></table></div>
+<div class="pc"><div class="p"><h5>What you gain</h5><ul><li>One place that sees the whole picture and can coordinate</li><li>Work is split and run in parallel on the slaves</li><li>A slow or failed slave's work can be handed to another (as Hadoop's master does, Chapter 12)</li><li>Session affinity is still possible: the master keeps sending a client to the same slave</li></ul></div>
+<div class="c"><h5>What you pay</h5><ul><li>The master is a single point of failure and a bottleneck</li><li>The master's monitoring and decisions are overhead</li><li>Slaves cannot act on their own</li></ul></div></div>
+<p class="use"><b>Seen in:</b> distributed data processing (a master with data nodes), primary–secondary database replicas (Chapter 10), and the driver–worker arrangement of Chapter 12.</p>
+</div></article>
+
+<!-- LOAD BALANCER -->
+<article class="pattern"><header><h4>Load Balancer</h4><span>Spread requests evenly over identical servers</span></header><div class="body">
+<figure class="fig"><div class="flow">
+<div class="step plain"><b>Many clients</b></div><span class="arr">→</span>
+<div class="step dark"><b>Load balancer</b><small>round robin, or "send to the freest server"</small></div><span class="arr">→</span>
+<div class="step"><b>Server replica 1</b></div><div class="step"><b>Server replica 2</b></div><div class="step"><b>Server replica 3</b></div></div>
+<figcaption>The servers offer the <b>same</b> service; the aim is that none is overloaded and none sits idle.</figcaption></figure>
+<p class="use"><b>Problem and context:</b> many providers give the same service and we want all of them well utilised. <b>Round robin</b> needs no information. <b>Least-loaded</b> needs each server to measure and report its load, which is itself computational overhead for both sides.</p>
+<p class="use"><b>Where it appears inside other patterns:</b> in front of a bottleneck layer (a replicated firewall), inside a pub/sub layer for the replicas of one popular publisher, and in front of each tier of a multi-tier system. With unequal servers, balancing becomes a hard estimation problem (Chapter 12).</p>
 </div></article>
 
 <!-- MONO / MODULAR / MICRO -->
@@ -572,12 +624,12 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 </svg><figcaption>Client–server: the client initiates, the server serves, and roles never switch. P2P: every peer is both client and server and switches role as needed.</figcaption></figure>
 <div class="call trap"><span class="lab">Common trap</span>"A server is the more powerful machine." No. Take two identical laptops: the one that <b>entertains requests</b> is the server; the one that <b>initiates</b> the connection is the client. A server might only hand out a roll number while the client does all the heavy statistics. The names describe <em>roles</em>, not computing power.</div>
 <div class="grid g2">
-<div class="card top"><h4>Client–server</h4><p class="use"><b>Use when</b> data or processing is shared by many users from many places and it is acceptable to keep everyone's data together.</p>
+<div class="card top"><h4>Client–server</h4><p class="use"><b>Use when</b> data or processing is shared by many users from many places and it is acceptable to keep everyone's data together. <i>A desktop office suite installed on each PC is not client–server; its online edition, with documents on a server and a light client, is.</i> A standardised interface (the web's get, post, put and delete) lets client and server change independently.</p>
 <div class="pc" style="grid-template-columns:1fr"><div class="p"><ul><li>Deploy and maintain functionality once; all clients get it</li><li>Light, low-cost clients; data survives a broken client</li><li>Server scales independently (replicas + load balancer); standard interface lets both sides evolve</li></ul></div><div class="c"><ul><li>Single point of failure; depends on the network</li><li>Unpredictable performance because client load varies</li><li>Limited control if the server belongs to another organisation</li></ul></div></div></div>
 <div class="card top"><h4>Peer-to-peer</h4><p class="use"><b>Use when</b> large files move between users, you want no expensive central server, no central point of failure, or more privacy.</p>
 <div class="pc" style="grid-template-columns:1fr"><div class="p"><ul><li>No server cost; data goes directly between peers</li><li>Grows and shrinks organically with the number of peers</li></ul></div><div class="c"><ul><li>Peers must be powerful enough to bear the processing</li><li>If the peer holding a file is offline, you cannot get it</li><li>Keeping every peer's view of the topology current is expensive; stale information spreads</li></ul></div></div></div>
 </div>
-<div class="call"><span class="lab">Teacher's note · pure P2P hardly exists</span>In file-sharing networks a <b>tracker</b> records which peers are online and what they hold. Until peers learn about each other the system is really client–server; only the transfer itself is P2P. Pure P2P would need static addresses and every peer knowing every other peer; the moment you add a routing table you have added a server. Likewise, a mobile payment that feels person-to-person passes through banks and a national payment switch.</div>
+<div class="call"><span class="lab">Teacher's note · pure P2P hardly exists</span>In file-sharing networks a <b>tracker</b> records which peers are online and what they hold. Until peers learn about each other the system is really client–server; only the transfer itself is P2P. Pure P2P would need static addresses and every peer knowing every other peer; the moment you add a routing table you have added a server. Likewise, a mobile payment that feels person-to-person passes through banks and a national payment switch. Even cryptocurrency mining is less peer-to-peer than it sounds: miners do not chat with each other; each verifies a block of transactions and submits its proof. A genuine small P2P case is two phones sharing a file directly over a short-range link.<br><br><b>Broadcast does not scale.</b> Announcing "I have joined" to everyone works only inside a local network. On the Internet a peer can only multicast to the neighbours it knows, and by the time "peer X is down" has spread across a large network, X may be up again, so two contradictory messages travel at once.</div>
 </div></article>
 
 <!-- SOA + PUBSUB -->
@@ -609,6 +661,30 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <div class="call"><span class="lab">Teacher's note · is "push" really push?</span>Your phone's IP address changes as you move between networks, and all communication needs an IP at the network layer. So the server cannot simply reach you. A client on the phone keeps contacting the notification service with its identity; done frequently, this <b>pull</b> feels like push. Holding an open socket per client is the alternative, but sockets bind server resources (a machine has only 2<sup>16</sup> = 65,536 ports), so plain polling serves many more clients.</div>
 </div></article>
 
+<!-- EVENT BUS -->
+<article class="pattern"><header><h4>Event Bus (Service Bus)</h4><span>A shared channel that every component can put messages on and take messages from</span></header><div class="body">
+<figure class="fig"><svg viewBox="0 0 640 215" role="img" aria-label="Event sources place messages on a bus and listeners pick them up">
+<rect class="bx" x="55" y="12" width="130" height="40" rx="8"/><text class="tx" x="120" y="32">Source A</text>
+<rect class="bx" x="255" y="12" width="130" height="40" rx="8"/><text class="tx" x="320" y="32">Source B</text>
+<rect class="bx" x="455" y="12" width="130" height="40" rx="8"/><text class="tx" x="520" y="32">Source C</text>
+<rect class="bxa" x="30" y="92" width="580" height="30" rx="15"/><text class="txw" x="320" y="107">Bus — every message travels the same route</text>
+<rect class="bx" x="55" y="162" width="130" height="40" rx="8"/><text class="tx" x="120" y="182">Listener 1</text>
+<rect class="bx" x="255" y="162" width="130" height="40" rx="8"/><text class="tx" x="320" y="182">Listener 2</text>
+<rect class="bx" x="455" y="162" width="130" height="40" rx="8"/><text class="tx" x="520" y="182">Listener 3</text>
+<path class="ln" marker-end="url(#ah)" d="M120 52V90"/><path class="ln" marker-end="url(#ah)" d="M320 52V90"/><path class="ln" marker-end="url(#ah)" d="M520 52V90"/>
+<path class="ln" marker-end="url(#ah)" d="M120 122V160"/><path class="ln" marker-end="url(#ah)" d="M320 122V160"/><path class="ln" marker-end="url(#ah)" d="M520 122V160"/>
+<text class="txs" x="220" y="72">put on</text><text class="txs" x="220" y="142">pick up</text>
+</svg><figcaption>Like the memory bus on a motherboard, or a city bus: it starts at one point and data is dropped off and picked up along the route.</figcaption></figure>
+<p class="use">You met this in computer architecture: the bus on the motherboard carries data between many locations. Components that produce something place it on the bus; components that need something take it off. Putting all services on a bus is an <b>integral characteristic of service-oriented architecture</b> (the "service bus").</p>
+<div class="tw"><table><tr><th></th><th>Broker</th><th>Event / service bus</th><th>Publish–subscribe</th></tr>
+<tr><td>Can providers talk to each other?</td><td>No</td><td><b>Yes</b>, through the bus</td><td>Only by publishing</td></tr>
+<tr><td>Middle element</td><td>Active: forwards a request to one server</td><td><b>Passive</b>: just a route</td><td>Active: finds subscribers and notifies them</td></tr>
+<tr><td>Who sees a message?</td><td>The chosen server</td><td>Anyone on the bus; nothing is hidden</td><td>Only subscribers of that channel</td></tr>
+<tr><td>How receivers learn of it</td><td>They are called</td><td>They keep checking the bus (pull)</td><td>They are notified (push)</td></tr></table></div>
+<div class="pc"><div class="p"><h5>What you gain</h5><ul><li>New sources and listeners plug in without changing the others</li><li>Any component can reach any other through one channel</li></ul></div>
+<div class="c"><h5>What you pay</h5><ul><li>No privacy on the bus; receivers must filter what is theirs</li><li>Receivers spend effort polling</li><li>All traffic shares one route, which can limit scale</li></ul></div></div>
+</div></article>
+
 <article class="pattern"><header><h4>Shared-Data</h4><span>Several components read and write one common store</span></header><div class="body">
 <figure class="fig"><svg viewBox="0 0 640 190" role="img" aria-label="Four applications sharing one data store">
 <rect class="bx" x="30" y="25" width="130" height="40" rx="8"/><text class="tx" x="95" y="45">Application 1</text>
@@ -625,6 +701,90 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <tr><td>Consistency</td><td>Writers can conflict; extra constraints and checks are needed</td><td>Subscribers are passive; no conflict</td></tr></table></div>
 <p class="use">A <b>read-only</b> shared-data system therefore behaves much like pub/sub.</p>
 </div></article>
+
+<!-- BLACKBOARD -->
+<article class="pattern"><header><h4>Blackboard</h4><span>Specialists build up a solution on a common board</span></header><div class="body">
+<figure class="fig"><svg viewBox="0 0 640 200" role="img" aria-label="Knowledge sources read and write a blackboard supervised by a control component">
+<rect class="bx" x="20" y="14" width="150" height="40" rx="8"/><text class="tx" x="95" y="34">Knowledge source 1</text>
+<rect class="bx" x="20" y="80" width="150" height="40" rx="8"/><text class="tx" x="95" y="100">Knowledge source 2</text>
+<rect class="bx" x="20" y="146" width="150" height="40" rx="8"/><text class="tx" x="95" y="166">Knowledge source 3</text>
+<rect class="bxa" x="250" y="55" width="170" height="90" rx="6"/><text class="txw" x="335" y="90">Blackboard</text><text class="txw" x="335" y="110" style="font-weight:400;font-size:11.5px">shared, evolving solution</text>
+<rect class="bxf" x="500" y="78" width="120" height="44" rx="8"/><text class="tx" x="560" y="100">Control</text>
+<path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M172 38L248 78"/><path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M172 100H248"/><path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M172 162L248 124"/>
+<path class="ln" marker-start="url(#ah)" marker-end="url(#ah)" d="M422 100H498"/>
+<text class="txs" x="560" y="140">watches the board,</text><text class="txs" x="560" y="155">decides who acts next</text>
+</svg><figcaption>A classroom board is the everyday picture: something is written where everyone can see it, and others add to it.</figcaption></figure>
+<p class="use">In the standard pattern literature a blackboard system has three parts: the <b>blackboard</b> (a shared store holding the partial solution), several <b>knowledge sources</b> (independent specialists that read the board and contribute what they can), and a <b>control</b> component that decides whose turn it is. It suits problems with no fixed solution procedure, where the answer emerges step by step, such as interpreting speech or signals.</p>
+<div class="pc"><div class="p"><h5>What you gain</h5><ul><li>Specialists are independent; new ones are easy to add</li><li>Different solution strategies can be tried on the same data</li></ul></div>
+<div class="c"><h5>What you pay</h5><ul><li>Many writers on one store: synchronisation and consistency control</li><li>Hard to test and to predict; no guarantee of reaching a good solution</li></ul></div></div>
+<div class="call think"><span class="lab">Think about it · asked in class</span>Is the blackboard pattern the same as publish–subscribe? Is it the same as shared-data? Compare: who may write, whether everyone sees everything, whether readers are notified or must look, and whether there is one copy or many.</div>
+</div></article>
+
+<!-- MAP-REDUCE -->
+<article class="pattern"><header><h4>Map-Reduce</h4><span>Split a huge analysis into parallel pieces, then aggregate</span></header><div class="body">
+<figure class="fig"><div class="flow">
+<div class="step plain"><b>Very large data set</b><small>spread over many nodes</small></div><span class="arr">→</span>
+<div class="step"><b>Map</b><small>many copies run in parallel, each transforming its own portion into key–value pairs</small></div><span class="arr">→</span>
+<div class="step"><b>Reduce</b><small>pairs with the same key are aggregated</small></div><span class="arr">→</span>
+<div class="step dark"><b>Result</b></div></div>
+<figcaption>A third part, the infrastructure, hides the distribution: it places the copies on machines, moves data between the phases and recovers from failures.</figcaption></figure>
+<p class="use">This is the pattern used in class to explain "discovered, not invented": many mathematical problems needed some x mapped to y and y reduced to z in order to be solved in parallel; once people noticed they were all doing the same thing, it was documented with its problem, context, pros, cons and alternatives. <b>Use it</b> when a very large data set must be analysed and the work can be divided by data.</p>
+<div class="pc"><div class="p"><h5>What you gain</h5><ul><li>Parallelism on commodity machines; scales by adding nodes</li><li>The programmer writes only the map and reduce functions</li></ul></div>
+<div class="c"><h5>What you pay</h5><ul><li>Overhead that is wasted on small data</li><li>Not for transactional reads, in-place updates or real-time streams</li></ul></div></div>
+<p class="use">The mechanics (split, map, shuffle, reduce) are worked through in <a href="#c8">Chapter 8</a>, and the platform that made it famous in <a href="#c12">Chapter 12</a>.</p>
+</div></article>
+
+<!-- INTERPRETER -->
+<article class="pattern"><header><h4>Interpreter</h4><span>A component that executes programs written in a dedicated language</span></header><div class="body">
+<figure class="fig"><div class="flow">
+<div class="step plain"><b>Program text</b><small>a query, a rule, a script, a formula</small></div><span class="arr">→</span>
+<div class="step"><b>Parser</b><small>turns the text into a tree of expressions, following the language's grammar</small></div><span class="arr">→</span>
+<div class="step"><b>Interpreter engine</b><small>evaluates each expression, one after another</small></div><span class="arr">⇄</span>
+<div class="step plain"><b>Context</b><small>the current state: variables, data, environment</small></div><span class="arr">→</span>
+<div class="step dark"><b>Result</b></div></div>
+<figcaption>The behaviour is not fixed in the system's code. It is supplied at run time as a small program, and the system interprets it line by line.</figcaption></figure>
+<p class="use">You already use this pattern every day. An <b>SQL engine</b> is an interpreter: you say <em>what</em> you want in a dedicated language, and the query parser and engine of Chapter 6 work out how. A Python program is executed line by line by an interpreter; a spreadsheet interprets formulas; a search box interprets a regular expression.</p>
+<p class="use"><b>Use when</b> users or administrators must be able to change the system's behaviour without rebuilding it, by writing queries, rules or scripts.</p>
+<div class="pc"><div class="p"><h5>What you gain</h5><ul><li>Highly dynamic behaviour: change the program, not the system</li><li>End users can express what they need themselves</li><li>The language is easy to extend with new expressions</li><li>Portability: the same program runs wherever the interpreter runs</li></ul></div>
+<div class="c"><h5>What you pay</h5><ul><li>Slower than compiled code, since work is repeated at run time</li><li>A large grammar becomes hard to maintain</li><li>Running user-supplied programs needs security care (a sandbox)</li></ul></div></div>
+</div></article>
+
+<!-- COMPILER -->
+<article class="pattern"><header><h4>Compiler Architecture</h4><span>A classic combination: pipe-and-filter phases around a shared store</span></header><div class="body">
+<figure class="fig"><svg viewBox="0 0 640 200" role="img" aria-label="Compiler phases as a pipeline sharing a symbol table">
+<text class="txs" x="55" y="22">source code in</text><text class="txs" x="585" y="22">target code out</text>
+<path class="ln lnd" d="M55 90L135 140M161 90V140M267 90V140M373 90V140M479 90V140M585 90L505 140"/>
+<rect class="bxf" x="10" y="38" width="90" height="52" rx="8"/><text class="tx" x="55" y="57">Lexical</text><text class="tx" x="55" y="73">analysis</text>
+<rect class="bxf" x="116" y="38" width="90" height="52" rx="8"/><text class="tx" x="161" y="57">Syntax</text><text class="tx" x="161" y="73">analysis</text>
+<rect class="bxf" x="222" y="38" width="90" height="52" rx="8"/><text class="tx" x="267" y="57">Semantic</text><text class="tx" x="267" y="73">analysis</text>
+<rect class="bxf" x="328" y="38" width="90" height="52" rx="8"/><text class="tx" x="373" y="57">Intermediate</text><text class="tx" x="373" y="73">code</text>
+<rect class="bxf" x="434" y="38" width="90" height="52" rx="8"/><text class="tx" x="479" y="64">Optimiser</text>
+<rect class="bxf" x="540" y="38" width="90" height="52" rx="8"/><text class="tx" x="585" y="57">Code</text><text class="tx" x="585" y="73">generator</text>
+<path class="ln" marker-end="url(#ah)" d="M100 64H114"/><path class="ln" marker-end="url(#ah)" d="M206 64H220"/><path class="ln" marker-end="url(#ah)" d="M312 64H326"/><path class="ln" marker-end="url(#ah)" d="M418 64H432"/><path class="ln" marker-end="url(#ah)" d="M524 64H538"/>
+<rect class="bxa" x="120" y="140" width="400" height="36" rx="8"/><text class="txw" x="320" y="158">Symbol table and error handler — shared by every phase</text>
+<text class="txs" x="110" y="108">tokens</text><text class="txs" x="214" y="108">parse tree</text><text class="txs" x="320" y="108">checked tree</text>
+</svg><figcaption>Each phase is a filter; the output of one is the input of the next. All phases also read and write one common store.</figcaption></figure>
+<p class="use">When you compile a program, several things happen in order: lexical analysis, syntax checks, semantic checks, optimisation, code generation (and macro expansion before all of them). That sequence is <b>pipe-and-filter</b>. The phases also consult a common symbol table, which is <b>shared-data</b>. So a compiler is a good example of two patterns combined, and of why we said real systems mix patterns.</p>
+<div class="grid g2">
+<div class="card"><h4>Compiler or interpreter?</h4><p>A <b>compiler</b> translates the whole program once, before it runs; errors are found early and the result runs fast. An <b>interpreter</b> translates and executes as it goes; it is more flexible and slower. Many platforms mix the two: source is compiled to an intermediate form, which a virtual machine then executes (Chapter 5).</p></div>
+<div class="card"><h4>The modern variant</h4><p>In an editor that checks your code as you type, the phases no longer run strictly left to right. The parse tree and symbol table become a central <b>repository</b>, and many tools (highlighter, checker, refactoring) work on it independently: closer to shared-data or blackboard than to a pipeline.</p></div>
+</div>
+<div class="pc"><div class="p"><h5>What you gain</h5><ul><li>Each phase can be built, tested and replaced separately</li><li>One front end can serve several back ends (one language, many machines), and the reverse</li></ul></div>
+<div class="c"><h5>What you pay</h5><ul><li>Phases must agree on the intermediate formats</li><li>The shared symbol table couples the phases to one another</li></ul></div></div>
+</div></article>
+
+<h5>More patterns you may meet</h5>
+<p>These were not worked through in class. One line each is enough to recognise them; reason about them with the same template if they appear in a question.</p>
+<div class="tw"><table>
+<tr><th>Pattern</th><th>Core idea</th><th>Closest relative in this chapter</th><th>Example</th></tr>
+<tr><td>Actor model</td><td>Independent actors, each with private state, that communicate only by asynchronous messages; nothing is shared</td><td>Peer-to-peer and publish–subscribe; the opposite of shared-data</td><td>Telecom switches, chat back ends</td></tr>
+<tr><td>Microkernel (plug-in)</td><td>A minimal core plus plug-ins that add features</td><td>The kernel-and-drivers idea of Chapter 5; dynamic loading in a monolith</td><td>Operating systems, browsers, code editors</td></tr>
+<tr><td>Repository</td><td>A central data store with independent tools working on it</td><td>Shared-data, blackboard</td><td>Development environments, version-control systems</td></tr>
+<tr><td>Event-driven architecture</td><td>Components react to events; nobody calls anybody directly</td><td>Event bus, publish–subscribe</td><td>User interfaces, sensor systems</td></tr>
+<tr><td>Object-oriented / component-based</td><td>The system is a set of objects or components with interfaces that call one another</td><td>Modular architecture</td><td>Most application frameworks</td></tr>
+<tr><td>Command–query separation (CQRS)</td><td>One model handles updates, another handles reads</td><td>Separate read and write replicas (Chapter 9)</td><td>Read-heavy web applications</td></tr>
+<tr><td>Circuit breaker</td><td>Stop calling a service that keeps failing, so that one failure does not cascade</td><td>Failure masking (Chapter 12)</td><td>Calls between microservices</td></tr>
+</table></div>
 </section>
 
 <section class="topic"><h3><span>2.3</span>One code base, many services: multi-tenancy</h3>
@@ -640,30 +800,41 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <div class="tw"><table>
 <tr><th>Pattern</th><th>Core idea</th><th>You gain</th><th>You pay</th></tr>
 <tr><td>Layered</td><td>One-way use of the layer below</td><td>Maintainability, predictability, fault containment</td><td>Every request crosses every layer</td></tr>
+<tr><td>Multi-tier</td><td>Layers on separate machine groups</td><td>Per-tier scaling and security</td><td>Cost, network hops</td></tr>
 <tr><td>Broker</td><td>Intermediary hides servers</td><td>Scalability, location independence</td><td>Broker as bottleneck or failure point</td></tr>
+<tr><td>Master–slave</td><td>One primary controls the rest</td><td>Coordination, parallel work, task reassignment</td><td>Master as bottleneck or failure point</td></tr>
+<tr><td>Load balancer</td><td>Spread requests over identical servers</td><td>Utilisation, scalability</td><td>Monitoring overhead if smart</td></tr>
 <tr><td>MVC</td><td>Data, presentation, control separated</td><td>Reusability, independent change</td><td>Complex two-way interaction</td></tr>
 <tr><td>Pipe &amp; filter</td><td>Stage-wise transformation</td><td>Reusable stages, easy evolution</td><td>Agreed formats, parsing overhead</td></tr>
 <tr><td>Client–server</td><td>Fixed requester and provider</td><td>Central data, cheap clients</td><td>Single point of failure</td></tr>
 <tr><td>Peer-to-peer</td><td>Every node plays both roles</td><td>No central cost or failure point</td><td>Topology upkeep, unreliable peers</td></tr>
 <tr><td>SOA</td><td>Independent business services</td><td>Reuse of whole use cases</td><td>Service coordination</td></tr>
 <tr><td>Publish–subscribe</td><td>Decoupled one-to-many delivery</td><td>Loose coupling, easy to add parties</td><td>No feedback; central layer</td></tr>
+<tr><td>Event / service bus</td><td>Passive shared channel</td><td>Any-to-any integration, easy to plug in</td><td>No privacy, polling, shared route</td></tr>
 <tr><td>Shared-data</td><td>Common store for many accessors</td><td>Easy data sharing</td><td>Consistency control</td></tr>
+<tr><td>Blackboard</td><td>Specialists refine a shared solution</td><td>Flexibility for ill-defined problems</td><td>Hard to test; consistency control</td></tr>
+<tr><td>Map-reduce</td><td>Parallel map, then aggregate</td><td>Analysis of very large data</td><td>Overhead; batch only</td></tr>
+<tr><td>Interpreter</td><td>Execute programs in a dedicated language</td><td>Behaviour changeable at run time</td><td>Speed; grammar upkeep</td></tr>
+<tr><td>Compiler architecture</td><td>Pipeline of phases + shared symbol table</td><td>Replaceable phases, reusable front and back ends</td><td>Agreed intermediate formats</td></tr>
 <tr><td>Microservices</td><td>Small end-to-end services with APIs</td><td>Independent teams and scaling</td><td>Many moving parts</td></tr>
 </table></div>
-<div class="call exam"><span class="lab">Exam tip</span>Expect "why this pattern and <em>not</em> that one?": why broker and not master–slave; why stateless or stateful; with or without affinity; why microservices and not modules. If a pattern appears that was never taught (say, <b>Blackboard</b>), infer it from the name, state <b>fair, realistic assumptions</b>, and reason from there. Do not "assume it is the same as" a pattern you know and describe that instead.</div>
+<div class="call exam"><span class="lab">Exam tip</span>Expect "why this pattern and <em>not</em> that one?": why broker and not master–slave; why stateless or stateful; with or without affinity; why microservices and not modules. If a pattern appears that was never taught, infer it from the name, state <b>fair, realistic assumptions</b>, and reason from there. Do not "assume it is the same as" a pattern you know and describe that instead.</div>
 
 <div class="recap"><h4>Chapter 2 recap</h4><ul>
 <li>A pattern is a known solution to a problem in a context; it is discovered after recurring, and documented with a six-part template.</li>
 <li>Layered: one-way, no bypass. Broker: hide servers, keep it dumb to scale. MVC: three parts, two-way.</li>
 <li>Client and server are roles, not sizes. Pure P2P is rare; discovery is usually client–server.</li>
 <li>Service = full business use case; microservice = end-to-end slice with an API; module = logical business unit.</li>
+<li>A broker connects; a master controls; a load balancer spreads requests over identical servers.</li>
 <li>Pub/sub is active and pushes to subscribers; a bus is passive and is polled; shared-data works on one common copy.</li>
+<li>Layers are logical, tiers are physical. Blackboard: specialists around a shared solution. Map-reduce: parallel map, then aggregate.</li>
+<li>Interpreter: behaviour supplied as a program at run time. A compiler combines pipe-and-filter with shared-data.</li>
 <li>Multi-tenancy: one code base, many logically isolated tenants.</li></ul>
 <p class="qh">Check yourself</p>
 <details class="qa"><summary>Why does the layered pattern forbid a layer from skipping the one below it?</summary><div class="a"><p>Skipping improves speed for that request but removes the guarantees: dependencies multiply, a change can ripple to several layers, and because different requests now use different numbers of layers, performance is no longer predictable, so capacity planning becomes guesswork.</p></div></details>
 <details class="qa"><summary>A ticket-booking site scales worse than a chat app with far more traffic. Is the booking site badly built?</summary><div class="a"><p>Not necessarily; it is the nature of the application. Booking must respect <b>sequence</b> (seats are allotted in order, after payment confirmation from a third party). A chat app does not guarantee message order, so its broker can stay dumb and scale. Transactional systems cannot scale like non-transactional ones.</p></div></details>
 <details class="qa"><summary>You force all model–view communication to go through the controller. What pattern do you now have?</summary><div class="a"><p>A layered (three-layer) arrangement. MVC is defined by the direct, two-way interaction among all three parts.</p></div></details>
-<details class="qa"><summary>Is a blackboard in a classroom the same as publish–subscribe?</summary><div class="a"><p>It is close: one party writes, many read. But there is no middle layer with channels and selective notification; everyone sees everything, which is nearer to a shared, mostly read-only data space. A good answer states this assumption and compares the two explicitly.</p></div></details>
+<details class="qa"><summary>Is a blackboard in a classroom the same as publish–subscribe?</summary><div class="a"><p>Not quite. On a classroom board one party writes and many read, which looks like one publisher with many subscribers. But there are no channels and no selective notification: everyone sees everything and must look for themselves, which is nearer to a shared data space. In the full blackboard pattern several knowledge sources also <em>write</em>, under a control component. A good answer compares the patterns on these points explicitly.</p></div></details>
 </div></section>
 </section>
 
@@ -692,7 +863,7 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 </table></div>
 <div class="grid g2">
 <div class="card top"><h4>Process view: processes, not threads</h4><p>One process may be shared by many modules (a single directory-login process used by every campus application). Draw processes and their communication, but <b>not threads</b>: synchronising threads is an algorithmic concern, not an architectural one.</p></div>
-<div class="card top"><h4>Physical view: real constraints</h4><p>Many modules can share a machine, or one module can span many machines. Decide by load, compute needs, and whether co-located processes interfere on data, privacy or performance. Do not put a critical module on an unreliable machine. Multi-zone deployment (say two regional data centres) belongs here.</p></div>
+<div class="card top"><h4>Physical view: real constraints</h4><p>Many modules can share a machine, or one module can span many machines. Decide by load, compute needs, and whether co-located processes interfere on data, privacy or performance. Do not put a critical module on an unreliable machine. Multi-zone deployment (say two regional data centres) belongs here.</p><p><b>Order matters too.</b> Some modules are prerequisites for others. Deploy unit modules first and then integrate them (bottom-up), or deploy stub modules and fill them in (top-down).</p></div>
 </div></section>
 
 <section class="topic"><h3><span>3.2</span>Drawing conventions and method</h3>
@@ -749,7 +920,8 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <div class="grid g2">
 <div class="card"><h4>The provider's hidden burden</h4><p>Updating a platform used by thousands of clients, some on old versions and some on new, without breaking anyone, requires <b>backward compatibility</b> (a messaging app still works between users on different versions, up to a cut-off). A virtualization layer on a distributed system is not yet a cloud service; this maintenance discipline is part of it.</p></div>
 <div class="card"><h4>Clouds inside clouds</h4><p>A SaaS product can itself be built on another provider's storage service. You can even run a VM inside a VM (nested virtualization): calls then cross two hypervisor layers, so performance drops, but it works. Comparing providers is hard because the "same" service is built differently (for instance on older disks versus SSDs).</p></div>
-</div></section>
+</div>
+<div class="call think"><span class="lab">Think about it</span><b>Where does "Hadoop as a service" fall?</b> It depends on what is handed to you. The whole ecosystem installed and ready to use: SaaS. Only the distributed file-system service, on which you build: PaaS. Bare machines on which you set up the distributed system yourself: IaaS. The same product can sit at any level.</div></section>
 
 <section class="topic"><h3><span>4.3</span>Four deployment models</h3>
 <div class="grid g4">
@@ -763,6 +935,10 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <div class="step dark"><b>Cloud burst</b><small>excess load is moved out</small></div><span class="arr">→</span>
 <div class="step"><b>Public cloud</b><small>rented only for the peak</small></div></div>
 <figcaption><b>Cloud bursting:</b> when the in-house cloud exceeds its capacity, part of the load shifts to a public cloud. Ideal for a booking site with a two-hour daily rush.</figcaption></figure>
+<div class="grid g2">
+<div class="card"><h4>Cloud user versus end user</h4><p>For an institute's hosted email, the <b>user of the cloud</b> is the institute, which buys the licence. The <b>end users</b> are its students and staff. Count organisations, not people, when you classify: one organisation → private; several similar organisations → community.</p></div>
+<div class="card"><h4>An everyday hybrid</h4><p>A VPN brings you from a public network into a private one. When the VPN service itself runs on pooled cloud resources, the result is a hybrid arrangement. (A VPN also makes a provider believe you are in another network, which is why region-limited services open through it.)</p></div>
+</div>
 <h5>How to decide</h5>
 <div class="grid g2">
 <div class="card"><ul>
@@ -872,7 +1048,7 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 50px;color:var(--muted);
 <p>A <b>hypervisor</b> is a technology and a desktop VM tool is a product built on it. In the same way, <b>containerization</b> is the technology and <b>Docker</b> is the product.</p>
 <div class="tw"><table>
 <tr><th></th><th>Virtual machine</th><th>Container</th></tr>
-<tr><td>Isolation happens at</td><td>Operating-system level: each VM has its own guest OS</td><td>Process level: built on the OS's own way of separating processes</td></tr>
+<tr><td>Isolation happens at</td><td>Operating-system level: each VM has its own guest OS</td><td>Process level: built on the same idea the OS uses to keep processes apart (the process control block), plus the ability to expose, control and migrate them</td></tr>
 <tr><td>Kernel</td><td>One per VM</td><td>All containers share the host's kernel</td></tr>
 <tr><td>Weight and speed</td><td>Heavy; extra OS layer</td><td>Light and fast; no layer in between</td></tr>
 <tr><td>Mixed operating systems</td><td>Yes: one guest Linux, another Windows</td><td>No: all applications must suit the host kernel</td></tr>
@@ -912,6 +1088,11 @@ docker run -d -p 3000:3000 node-app:v1
 <span class="c"># list running containers</span>
 docker ps</pre>
 <p style="font-size:14.5px"><b>Practice:</b> containerise a page showing your name, roll number and registered courses. Then serve a page with the Nginx image on port 80, and again on another port.</p></div>
+</div>
+<div class="grid g3">
+<div class="card"><h4>Images are built in layers</h4><p>Every image starts <code>FROM</code> a base image (here a lightweight Linux with Node) and adds layers on top: dependencies, then your code. All containers on a host need a compatible base, because they share its kernel.</p></div>
+<div class="card"><h4>On Windows and macOS</h4><p>Docker Desktop includes a small Linux virtual machine; on Windows it asks to use WSL 2 in place of Hyper-V. On a Mac, download the build for your chip (Apple silicon or Intel).</p></div>
+<div class="card"><h4>Next steps</h4><p>Pull ready-made images from the registry, put a web server such as Nginx in front of your app, and describe several containers together with Docker Compose. Use containers in your course projects.</p></div>
 </div>
 <div class="recap"><h4>Chapter 5 recap</h4><ul>
 <li>Virtualization abstracts compute, storage, network and application so they can be controlled by software at run time.</li>
@@ -966,11 +1147,11 @@ docker ps</pre>
 <div class="call"><span class="lab">Teacher's note</span>Someone noticed that this logic <b>recurs across domains with the same outcome</b>. That is the definition of a pattern. It was abstracted out, implemented once, optimised and offered as a service. A database is a product of modular architecture, and for this course <b>the DBMS is a pattern</b>: in a project report you justify its pros and cons like any other.</div>
 <h5>What the pattern gives you</h5>
 <div class="grid g4">
-<div class="card"><h4>Managing data</h4><p>You hand over storage and organisation and stop worrying about it.</p></div>
+<div class="card"><h4>Managing data</h4><p>You hand over storage and organisation and stop worrying about it, for many users at once.</p></div>
 <div class="card"><h4>Scale</h4><p>Related rows and columns are retrieved efficiently, where a plain file system would crawl.</p></div>
-<div class="card"><h4>Heterogeneity</h4><p>A schema (metadata) declares mixed types and lengths per field, so varied data is still manageable.</p></div>
+<div class="card"><h4>Heterogeneity</h4><p>A schema (metadata) declares mixed types and lengths per field, so varied data is still manageable. Multimedia is kept as a binary large object (BLOB) outside the table, with only a reference inside.</p></div>
 <div class="card"><h4>Efficiency</h4><p>Efficient storage plus efficient retrieval (next section).</p></div>
-<div class="card"><h4>Persistence</h4><p>Changes are durable on secondary storage; a relationship once created does not vanish.</p></div>
+<div class="card"><h4>Persistence</h4><p>Changes are durable on secondary storage; a relationship once created does not vanish. (In-memory databases exist now that RAM is large, but secondary storage remains the main purpose.)</p></div>
 <div class="card"><h4>Reliability</h4><p>Well-tested code with predictable behaviour.</p></div>
 <div class="card"><h4>Consistency</h4><p>Data is kept in the form that model promises: relations, documents or columns.</p></div>
 <div class="card"><h4>Redundancy control</h4><p>Avoid duplicates, or replicate deliberately with a replication factor for availability.</p></div>
@@ -1024,6 +1205,10 @@ docker ps</pre>
 <div class="card"><h4>Recovery manager</h4><p>Rollback and undo, and recovery from failures such as a dead disk.</p></div>
 </div>
 <p><b>Transaction:</b> a set of instructions executed <b>all together or not at all</b>. This is wider than banking: writing one record into a document is a transaction too; if it stops half-way, the write must be reported as failed. A bank transfer is simply several small transactions (debit, credit) clubbed together, which is why failures in between are possible and why transfers get so much study.</p>
+<div class="grid g2">
+<div class="card top"><span class="tag">ACID</span><h4>The transactional guarantee</h4><ul><li><b>A</b>tomicity: all or nothing</li><li><b>C</b>onsistency: from one valid state to another</li><li><b>I</b>solation: parallel transactions do not interfere</li><li><b>D</b>urability: once committed, it stays</li></ul><p>What relational engines provide, and what finance needs.</p></div>
+<div class="card top"><span class="tag">BASE</span><h4>The NoSQL counterpart</h4><ul><li><b>B</b>asically <b>A</b>vailable: the system keeps answering</li><li><b>S</b>oft state: data may still be settling</li><li><b>E</b>ventual consistency: replicas converge in time</li></ul><p>The two are sometimes contradictory by nature, so a store that offers both at once is a compromise, not a perfect database.</p></div>
+</div>
 <div class="call exam"><span class="lab">Exam tip</span>If asked to justify using a DBMS in your solution, do not stop at "transactions". Walk through the components and justify each for the scenario: why you need authentication, a query optimiser for efficient access, persistence, buffering, a scheduler for simultaneous work, and recovery against data loss. For each, say what goes wrong without it.</div>
 <h5>The database ecosystem</h5>
 <p>A DBMS never works alone. If you design a new one, think about all of these:</p>
@@ -1065,7 +1250,7 @@ docker ps</pre>
 <ellipse class="bx" cx="320" cy="172" rx="40" ry="16"/><text class="tx" x="320" y="172">grade</text>
 <ellipse class="bx" cx="515" cy="28" rx="40" ry="16"/><text class="tx" x="515" y="28" style="text-decoration:underline">code</text>
 <ellipse class="bx" cx="515" cy="172" rx="40" ry="16"/><text class="tx" x="515" y="172">title</text>
-</svg><figcaption>Rectangle = entity · diamond = relationship · oval = attribute · underlined = key · double oval = multivalued · dashed oval = derived. Note that <b>grade</b> belongs to the relationship, not to either entity.</figcaption></figure>
+</svg><figcaption>Rectangle = entity · diamond = relationship · oval = attribute · underlined = key · double oval = multivalued · dashed oval = derived. An attribute with sub-parts, such as <b>address</b> (street, city, PIN), is composite. Note that <b>grade</b> belongs to the relationship, not to either entity.</figcaption></figure>
 <div class="grid g2">
 <div class="card"><h4>Relationships have attributes too</h4><ul><li><b>Cardinality:</b> one-to-one, one-to-many, many-to-many</li><li><b>Existence dependency:</b> a placement-portal record can exist only if the student record exists; when the parent goes, the child goes</li><li>Relationships can be dynamic: present at one time, absent at another</li></ul></div>
 <div class="card"><h4>From ER to relations</h4><ul><li>An entity becomes a relation.</li><li>A <b>many-to-many</b> relationship becomes its <b>own relation</b> (link table). One-to-one is usually folded in as an extra column.</li><li>Several phone numbers per person: adding <code>phone2</code>, <code>phone3</code> columns leaves most cells empty. Model phone as a separate relation instead.</li></ul></div>
@@ -1088,12 +1273,13 @@ docker ps</pre>
 </section>
 
 <section class="topic"><h3><span>7.3</span>The relational model: selection, projection, orientation</h3>
-<p>In the relational model everything is a <b>relation</b> (it looks like a table, but say "relation"). Columns are <b>attributes</b>; each has a <b>domain</b>, the set of values it is allowed to take.</p>
+<p>In the relational model everything is a <b>relation</b> (it looks like a table, but say "relation"). Columns are <b>attributes</b>; each has a <b>domain</b>, the set of values it is allowed to take; the <b>range</b> is the set of values actually present (a domain of "multiples of four up to 100" may have a range of only 4 to 12).</p>
 <pre>SELECT  name, cgpa          <span class="c">-- PROJECTION: choose a few columns out of many</span>
 FROM    student
 WHERE   branch = 'CS';      <span class="c">-- SELECTION: filter rows by a condition</span></pre>
 <div class="call trap"><span class="lab">Common trap</span>The keyword <code>SELECT</code> names the whole query. The column list after it is <b>projection</b>. The <b>selection</b> operator is the <code>WHERE</code> condition.</div>
 <p><b>How should a "table of 2" be stored?</b> As a row <code>2, 4, 6, 8…</code> or as a column? The right answer is: <em>it depends on how you will query it and what the DBMS supports</em>. That decision, row-oriented or column-oriented, is yours to make as an architect, and we return to it in Chapter 8.</p>
+<div class="call"><span class="lab">Teacher's note · normalisation</span>The normal forms (1NF, 2NF, 3NF, BCNF) continue the relational story: the higher you go, the more relations you get, with one-to-many and many-to-many relationships moved into their own tables. Remember the consequence for this course: more relations mean more joins and more constraints, the complexity discussed in 7.6. Normalisation ideas also exist for non-relational stores.</div>
 </section>
 
 <section class="topic"><h3><span>7.4</span>The curse of dimensionality</h3>
@@ -1146,6 +1332,10 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="card"><span class="tag">6 · Scalability</span><p>Metadata, indexes and views make on-disk size grow much faster than the data, not linearly with it.</p></div>
 <div class="card"><span class="tag">7 · Volume</span><p>Large volume means several instances, and keeping several replicas of tables in sync is a headache (Chapter 9).</p></div>
 </div>
+<div class="grid g2">
+<div class="card"><h4>Schema versus metadata</h4><p>The <b>schema</b> is the structure: relations, columns, types, keys, constraints. <b>Metadata</b> is larger: the schema plus indexes, views and everything else the engine keeps about the data. That extra material is why storage grows so quickly.</p></div>
+<div class="card"><h4>What about history?</h4><p>A relation holds the current value. To see earlier values of a cell you must arrange it yourself, with timestamps or triggers that write an audit trail. Several NoSQL stores keep previous versions by default.</p></div>
+</div>
 <div class="call"><span class="lab">Teacher's note · no free lunch</span>A relational engine provides ACID whether you use it or not, and ACID is expensive. A photo feed or a lecture-video site does not need transactional accuracy; a slightly delayed update is fine. If you are paying for a guarantee you do not need, you are using the wrong tool.</div>
 <div class="recap"><h4>Chapter 7 recap</h4><ul>
 <li>Entity = set of attributes; relationship = logical association, with its own attributes; many-to-many becomes its own relation.</li>
@@ -1190,6 +1380,11 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="card top"><h4>Built for transitive queries</h4><p>Friends of friends, mutual connections, number of hops, shortest or alternative paths. <b>Try it:</b> design a relational schema that answers "count our common friends" efficiently. You will not find a clean one; that query is why graph databases exist.</p></div>
 </div>
 <p class="use"><b>Use for</b> social networks and geographic or road data (multiple roads between cities make it a multigraph; one-way streets make direction matter). <b>Do not use for</b> transaction-heavy work: traversal is the strength here, and transactional guarantees are not what it is optimised for.</p>
+<div class="grid g3">
+<div class="card"><h4>Kinds of graph</h4><ul><li><b>Simple</b>: at most one edge between two nodes</li><li><b>Directed / undirected</b>: does direction matter?</li><li><b>Multigraph</b>: several edges between the same nodes; graphs can even nest inside nodes</li><li><b>Dynamic or probabilistic</b>: relationships that change or are uncertain</li></ul></div>
+<div class="card"><h4>Paths worth knowing</h4><ul><li><b>Eulerian path</b>: uses every edge exactly once</li><li><b>Hamiltonian path</b>: visits every node exactly once</li><li>A <b>cycle</b> ends where it started; a path need not</li><li>Travelling-salesman-style routing is the typical workload</li></ul></div>
+<div class="card"><h4>In practice</h4><ul><li>Stored as adjacency lists or matrices, edge lists or incidence matrices</li><li><b>Small world:</b> you are said to be about six acquaintances from anyone, fewer in today's networks</li><li>Graph theory tells you what such a database <em>can</em> do, as relational algebra does for SQL</li><li>Example product: Neo4j</li></ul></div>
+</div>
 </section>
 
 <section class="topic"><h3><span>8.3</span>XML: the semi-structured store</h3>
@@ -1201,7 +1396,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 
 <section class="topic"><h3><span>8.4</span>Key–value stores and MapReduce</h3>
 <div class="grid g2">
-<div class="card top"><h4>The model</h4><p>Data is stored as <b>key → value</b>. The key is unique and uniform (a roll number); the value can be anything, in any shape: one person's profile lists work experience, another's does not. That is why it is <b>schema-less</b>. The natural structure is a hash table.</p></div>
+<div class="card top"><h4>The model</h4><p>Data is stored as <b>key → value</b>. The key is unique and uniform (a roll number); the value can be anything, in any shape: one person's profile lists work experience, another's does not. That is why it is <b>schema-less</b>. The natural structure is a hash table. <i>Products: Redis, Memcached.</i></p></div>
 <div class="card top"><h4>Good and bad at</h4><p><b>Fast:</b> fetch the value for a key. <b>Slow:</b> search by value, since you must visit every pair.</p><p><i>Ideal case:</i> phone number → caller name. Also caching. The moment you want to analyse who calls whom and when, it is no longer a pure key–value job.</p></div>
 </div>
 <p><b>Distributed key–value data.</b> With millions of pairs spread over many nodes, keys are stored in arrival order, not sorted. Think of an exam hall: seating by roll number means everyone searches for a seat; seating in order of arrival is quick. So <b>writes are fast</b> and single look-ups are slow. That suits <b>write-heavy data that is read in bulk for analysis</b>, such as logs: you never want one log line, you want the pattern.</p>
@@ -1213,7 +1408,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="step dark"><b>4 · Reduce</b><small>aggregate each group:<br><code>bear 2 · car 3 · deer 2 · river 2</code></small></div></div>
 <figcaption><b>MapReduce</b> keeps mapping existing key–value pairs to new ones and aggregating them. Phases are optional; use the ones your problem needs.</figcaption></figure>
 <div class="call trap"><span class="lab">Common trap</span>"Reduce" does not always reduce the number of keys. Three sentences (three keys) became four words here; ten sentences could become hundreds of words. Reduce means <em>aggregate</em>.</div>
-<div class="call"><span class="lab">Teacher's note</span>Both relational and key–value stores accept many writes. The difference is in the reads: <b>transactional reads → relational wins; analytical reads over write-heavy data → key–value with MapReduce wins.</b> Any model can be converted into any other. The question is never "can it be converted?" but "is it efficient for my queries?".</div>
+<div class="call"><span class="lab">Teacher's note</span>Both relational and key–value stores accept many writes. The difference is in the reads: <b>transactional reads → relational wins; analytical reads over write-heavy data → key–value with MapReduce wins.</b> Any model can be converted into any other. The question is never "can it be converted?" but "is it efficient for my queries?". MapReduce ruled industry for about two decades; newer engines generalise it to a directed acyclic graph (DAG) of steps, as you will see in Chapter 12.</div>
 </section>
 
 <section class="topic"><h3><span>8.5</span>Document stores</h3>
@@ -1248,8 +1443,10 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <li>Reading one complete entity means rebuilding the tuple from many columns.</li></ul></div></div>
 <div class="grid g2">
 <div class="card"><h4>Why buffers exist at all</h4><p>A buffer sits between two parties working at different speeds. The CPU produces results faster than the disk can store them, so results wait in a buffer and are arranged properly later, in a batch. A database <b>cursor</b> is one: the engine runs the query once, parks 100 results, and you fetch them one by one.</p><p><i>Analogy:</i> the chair in a hostel room where laundry waits until you have time to arrange the cupboard.</p></div>
-<div class="card"><h4>Compression and information</h4><p>A 1-terabyte file containing only the letter <code>a</code> carries almost no information; store "<code>a</code>, repeated to 1 TB" in a few bytes. How far data can be compressed is set by its <b>entropy</b> (Shannon): orderly data compresses well, highly random data hardly at all.</p><p><b>Lossless:</b> the original can be rebuilt exactly (identify students by roll number). <b>Lossy:</b> some is gone for good (identify them by date of birth).</p></div>
-</div></section>
+<div class="card"><h4>Compression and information</h4><p>A 1-terabyte file containing only the letter <code>a</code> carries almost no information; store "<code>a</code>, repeated to 1 TB" in a few bytes. How far data can be compressed is set by its <b>entropy</b> (Shannon): orderly data compresses well, highly random data hardly at all. Run-length and Huffman coding are the classic techniques.</p><p><b>Lossless:</b> the original can be rebuilt exactly (identify students by roll number). <b>Lossy:</b> some is gone for good (identify them by date of birth).</p></div>
+</div>
+<div class="call think"><span class="lab">Think about it · an information paradox</span><b>"Name the largest 20-digit number that cannot be described in fewer than 19 words."</b> Count the words in that sentence: it has just described the number in fewer than 19 words. So no such number can exist.
+<br><br>The lesson for compression: the same information can be written in forms of very different size. "Three", "3" and "III" say the same thing; "the largest two-digit number" and "99" say the same thing in six bytes or two. Compressing is choosing the shortest faithful representation, and information theory sets the limit.</div></section>
 
 <section class="topic"><h3><span>8.7</span>Choosing a store</h3>
 <div class="tw"><table>
@@ -1291,6 +1488,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="card top"><span class="tag">Distribution</span><p><b>Divides</b> one database across machines. One query may have to visit several machines. Purpose: scale and specialisation.</p></div>
 </div>
 <p>The two are <b>orthogonal</b>: use either alone, or both together (for instance, pairs of disks that share the data between them, replicated across pairs).</p>
+<div class="card top" style="margin:14px 0"><h4>A common use of replicas: separate reads from writes</h4><p>Keep one copy for <b>writes</b> and another for <b>reads</b>. A balance enquiry only reads; adding interest reads, computes and writes back. The copies are synchronised in real time, near real time, or offline. Banks run heavy write jobs such as interest and instalment calculation around midnight, when transactions are fewest. Useful, but it is replication, not a reason to distribute.</p></div>
 <div class="call trap"><span class="lab">Common trap</span>"We need a distributed database for fault tolerance." That is replication's job. Pure distribution gives only a limited flavour of it: if the machine holding academic records fails, you can still run queries on the demographic part, with fewer features.</div>
 <p><b>RAID</b> (Redundant Array of Inexpensive Disks) keeps redundant copies across an array of cheap disks, but it behaves as a single unit: the program has no idea where its data lies. In a <b>distributed database</b>, developers <em>know</em> the data is distributed and write programs accordingly.</p>
 </section>
@@ -1311,6 +1509,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <li><b>Consistency:</b> even the best sync takes a fraction of a millisecond, and a read can land inside that window.</li></ul></div>
 </div>
 <div class="call think"><span class="lab">Think about it · where should the computation happen?</span>Bring the data to the computation, or take the computation to the data? A stored procedure runs <em>inside</em> the database, like editing shared slides online, instead of downloading the file, editing and sending it back. Either choice, or meeting half-way, is possible, and each combination brings new challenges.</div>
+<p>Fog and edge computing, where processing moves close to the devices that produce the data, are distributed computing paradigms too. Every principle in this chapter and the next applies to them.</p>
 </section>
 
 <section class="topic"><h3><span>9.3</span>When replicas disagree</h3>
@@ -1332,7 +1531,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="card top"><h4>The answer from class: 5, or nothing</h4><p>Not 7, even though it is newer and the reader saw it twice. At some point <b>all five</b> replicas agreed on 5. The 7 is work in progress: if the transaction fails, it will be rolled back. A value is not durable until every replica has it.</p></div>
 <div class="card top"><h4>How locking enforces this</h4><p>With two-phase locking, A must first obtain an <b>exclusive lock</b> on x at <em>all</em> replicas. If the split happens before that, no one is updated and x stays 5 everywhere. If it happens after A and B are updated, x is still locked: a reader either waits or is given the <b>last committed</b> value, 5.</p></div>
 </div>
-<div class="call"><span class="lab">Teacher's note</span>Replicas never accept a reader's word that another replica holds a different value: the reader is outside the system and might be an attacker. They confirm among themselves. <b>How many replicas?</b> At least three, to survive one failure (with two, you cannot tell which survivor is right). Five to survive two at once.</div>
+<div class="call"><span class="lab">Teacher's note</span>Replicas never accept a reader's word that another replica holds a different value: the reader is outside the system and might be an attacker. They confirm among themselves. <b>How many replicas?</b> At least three, to survive one failure (with two, you cannot tell which survivor is right). Five to survive two at once. All of this assumes honest nodes: a compromised node that spreads a wrong value consistently is a separate, harder problem.</div>
 </section>
 
 <section class="topic"><h3><span>9.4</span>Distribution transparency</h3>
@@ -1356,6 +1555,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <tr><td>Network partition</td><td>Nothing has failed, yet one part of the system cannot reach another, though each may still reach users</td><td>The application decides what to keep offering: reads only, writes only, both or neither</td></tr>
 </table></div>
 <p>Failures cannot be avoided. In a monolithic system a failure reaches the user; in a distributed one we can <b>hide its effect</b> and keep serving, which is the main motive for going distributed.</p>
+<p><b>Not a failure, but an attack:</b> in a denial-of-service attack the requests themselves look genuine; it is their sender who is not. They flood the server so that genuine users cannot be served. Spread over many source machines, it is hard to tell from real load.</p>
 <div class="recap"><h4>Chapter 9 recap</h4><ul>
 <li>Replication = copies (availability). Distribution = division by rows or columns (scale). They are orthogonal.</li>
 <li>Distribute for horizontal scale, heterogeneous data and decentralised control; expect overhead and non-linear speed-up.</li>
@@ -1391,6 +1591,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <tr><td>Eventual</td><td>A form of weak consistency: <b>if no new updates arrive, all replicas eventually converge</b>. No bound on how soon. Replicas keep the value with the newest timestamp and discard older ones arriving late.</td><td>A window of inconsistency in which decisions can be made on out-of-date data</td><td>The domain name system: a changed address reaches different name servers at different times</td></tr>
 <tr><td>Causal</td><td>Operations that are causally related are seen by everyone in the right order; independent ones may appear in any order.</td><td>Dependencies must be tracked: centrally (hurts scale) or with vector clocks</td><td>A reply to a comment must never appear before the comment</td></tr>
 </table></div>
+<p>Stores that favour availability and settle for eventual consistency are the ones summarised as <b>BASE</b> (Chapter 6); strong consistency is the world of <b>ACID</b>.</p>
 <div class="grid g2">
 <div class="card"><h4>More replicas: a double-edged sword</h4><p>More replicas raise availability and make strong consistency harder. Fewer replicas make strong consistency easier and lower availability.</p></div>
 <div class="card"><h4>Implementing strong consistency</h4><p>Replicas kept in sync, or a <b>primary</b> replica that takes the write and updates the secondaries (the primary is then a single point of failure, and a standby primary must itself be kept in sync). A reader is kept away from a half-done write by an <b>exclusive lock</b> on every replica.</p></div>
@@ -1512,6 +1713,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="step"><b>Phase 2 · web era</b><small>anyone creates content, so data turns unstructured: information retrieval, opinion mining, question answering, web and social-network analytics, spatio-temporal analysis</small></div><span class="arr">→</span>
 <div class="step dark"><b>Phase 3 · mobile and sensor era</b><small>location-aware, person-centred and context-relevant analysis, mobile visualisation, human–computer interaction; structured + unstructured + multimedia together</small></div></div>
 <p>IoT is the textbook generator of phase-3 data: real-time, largely unstructured, from a huge number of sensors, with actuators waiting for the analysis. Any platform we design must interface with such a source.</p>
+<div class="call"><span class="lab">Teacher's note · two ways to attack a Big Data problem</span><b>At the algorithm level:</b> design streaming algorithms that handle large data in real time, improving time and space complexity. <b>At the system level:</b> choose the architectural patterns that let a platform ingest, store and process it. A messaging system is highly scalable not because of one clever algorithm but because of the patterns it is built from. The next chapter takes the system view.</div>
 <div class="recap"><h4>Chapter 11 recap</h4><ul>
 <li>Processing rearranges data; analytics extracts meaning.</li>
 <li>A thing = physical object + software + sensor and/or actuator, on a network with an agreed protocol and format.</li>
@@ -1591,11 +1793,11 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 </section>
 
 <section class="topic"><h3><span>12.5</span>Case study: Hadoop</h3>
-<p>Hadoop ingests and stores very large data in a replicated, highly available way on commodity machines and processes it efficiently (a common industrial use is log and service-request processing).</p>
+<p>Hadoop ingests and stores very large data in a replicated, highly available way on commodity machines and processes it efficiently (a common industrial use is log and service-request processing). The project is named after a toy elephant, and the service that looks after all the animals is, fittingly, called ZooKeeper.</p>
 <div class="grid g2">
 <figure class="fig" style="margin:0"><div class="stack">
-<div class="lay">Query interfaces<small>SQL-like queries and scripts over the store</small></div>
-<div class="lay key">Distributed database (HBase)<small>a key–value store; a master controls regions, and regions talk only through it</small></div>
+<div class="lay">Query interfaces (Hive, Pig)<small>SQL-like queries and scripts over the store</small></div>
+<div class="lay key">Distributed database (HBase)<small>a key–value store; a master (HMaster) controls regions, and regions talk only through it</small></div>
 <div class="lay you">Distributed file system<small>one client talks to many data nodes; stores files transparently in several places</small></div>
 <div class="row"><div class="lay hw">Data node</div><div class="lay hw">Data node</div><div class="lay hw">Data node</div></div>
 <div class="lay prov">Coordination service (ZooKeeper): watches whether machines are up and connected</div></div>
@@ -1641,7 +1843,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="card top"><h4>The trade-off: memory for speed</h4><p>Keeping intermediate results costs space, so you say explicitly which ones to keep. Spark needs much more RAM and is faster; disk-based Hadoop processing is slower and needs less. Time against space again.</p></div>
 <div class="card top"><h4>Where it fits</h4><p>Data that is <b>added</b> continuously (streaming) suits Spark. Data whose existing values are <b>updated</b> over and over suits neither Spark nor Hadoop; look elsewhere.</p></div>
 </div>
-<div class="call exam"><span class="lab">Exam tip</span>"How would you use an RDD, or a similar concept, in this scenario?" is a natural question. A good answer says which intermediate results are worth keeping, what failure they protect against, and what the extra memory costs.</div>
+<div class="call exam"><span class="lab">Exam tip</span>"How would you use an RDD, or a similar concept, in this scenario?" is a natural question. A good answer says which intermediate results are worth keeping, what failure they protect against, and what the extra memory costs. Another likely prompt: design a <em>new</em> system that merges two existing ones, for example messaging and processing for a dynamic streaming workload, and justify each of the six features of 12.2.</div>
 </section>
 
 <section class="topic"><h3><span>12.7</span>The tool landscape and open problems</h3>
@@ -1691,6 +1893,11 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="card top"><h4>Migration is architecture work</h4><p>Moving an application from on-premise or another cloud means designing the target architecture, building pipelines and then migrating, across infrastructure, data, networking, automation and AI teams.</p></div>
 <div class="card top"><h4>Cost is a quality attribute</h4><p>Pay-per-use cuts both ways: a query that scans everything is billed for everything. Optimise queries and indexes, and switch off unused machines and services. Large customers have dedicated cost-management teams.</p></div>
 <div class="card top"><h4>Skills that matter</h4><p>Fundamentals of databases and networking, coding ability, hands-on cloud practice (use your credits, and <b>stop your VMs</b> when idle), and clear communication within a mixed team.</p></div>
+</div>
+<div class="grid g3">
+<div class="card top"><h4>Typical migration projects</h4><ul><li>One data warehouse to another</li><li>A commercial relational database to a managed open-source-compatible one</li><li>Another cloud's managed database to this cloud</li><li>Combining data sets from 15 or more projects through data sharing, without copying</li></ul><p>Projects run from two months to a year; the final cut-over is done at night with the product team on call.</p></div>
+<div class="card top"><h4>AI inside the data platform</h4><ul><li>Built-in models callable from SQL: regression, clustering, time-series forecasting; your own models can be imported</li><li>Generative functions: text generation, summarising, sentiment, embeddings</li><li>Chatbots built from a conversational-agent service plus small serverless functions</li></ul><p><i>Example: product reviews arrive → a sentiment column is added → a dashboard and scheduled email reach managers.</i></p></div>
+<div class="card top"><h4>Getting hired into such a role</h4><ul><li>A fundamentals round: networking, databases, and your own projects</li><li>Two coding rounds</li><li>A behavioural round: how you build and work in a diverse, remote team</li><li>A professional data-engineer certification is a plus</li></ul></div>
 </div></section>
 </section>
 
@@ -1730,6 +1937,11 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <tr><td>Recovery</td><td>Checkpoints, rebuild of a lost node from replicas, cold versus hot standby given the power budget.</td></tr>
 </table></div>
 <div class="call trap"><span class="lab">What does not earn marks</span>Naming a technology that was never discussed and declaring the problem solved. Describe the idea in the course's terms: distribute, replicate, choose the pattern, justify. And keep assumptions realistic for today's world.</div>
+<h5>More scenarios to practise</h5>
+<div class="grid g2">
+<div class="card"><ul><li>Pick one of the 12 cloud combinations for: a mission-critical real-time system; a public streaming service; a booking system with extreme daily peaks.</li><li>Design one code base that offers email, chat and a forum to different tenants. How do you keep tenants from interfering?</li><li>The same workload must be served for low-dimensional and then for high-dimensional records. What changes in your data centre?</li></ul></div>
+<div class="card"><ul><li>Move a data set efficiently from one kind of DBMS to a different kind (not a one-off script: it must work for many data sets).</li><li>Deliver true push notifications to phones whose addresses keep changing, without constant polling.</li><li>Combine a relational and a document store under one query language. Which data goes where?</li><li>Design a new data-intensive platform that merges messaging with batch processing.</li></ul></div>
+</div>
 </section>
 
 <section class="topic"><h3><span>D</span>Quick decision tables</h3>
@@ -1737,9 +1949,13 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="tw" style="margin:0"><table style="min-width:0"><tr><th>If the scenario says…</th><th>Think of…</th></tr>
 <tr><td>Clear, ordered responsibilities; predictability</td><td>Layered</td></tr>
 <tr><td>Servers come and go; clients must not care</td><td>Broker (dumb for scale)</td></tr>
+<tr><td>One coordinator must hand out work and collect it</td><td>Master–slave</td></tr>
 <tr><td>Same data, several presentations</td><td>MVC</td></tr>
 <tr><td>Stage-by-stage data transformation</td><td>Pipe and filter</td></tr>
+<tr><td>Users change behaviour by writing queries or rules</td><td>Interpreter</td></tr>
 <tr><td>Many receivers, sender should not know them</td><td>Publish–subscribe</td></tr>
+<tr><td>Many services must reach each other through one channel</td><td>Event / service bus</td></tr>
+<tr><td>Scale or secure each layer separately</td><td>Multi-tier + load balancer</td></tr>
 <tr><td>Large transfers, no central server</td><td>Peer-to-peer (with a tracker)</td></tr>
 <tr><td>Whole business functions to be reused</td><td>SOA; microservices inside</td></tr>
 <tr><td>One code base for several products or customers</td><td>Multi-tenancy</td></tr></table></div>
@@ -1761,6 +1977,7 @@ B: W2(x=5)  W1(x=10)  W3(x=6)  R4(x) → 6</pre><p>The first two are independent
 <div class="card"><span class="big">4+1</span><p>views: logical, process, development, physical + scenarios</p></div>
 <div class="card"><span class="big">5 · 3 · 4</span><p>cloud characteristics, service models, deployment models (12 combinations)</p></div>
 <div class="card"><span class="big">8</span><p>DBMS components, from query interface to recovery manager</p></div>
+<div class="card"><span class="big">ACID · BASE</span><p>atomic, consistent, isolated, durable · basically available, soft state, eventually consistent</p></div>
 <div class="card"><span class="big">3 → 1</span><p>three replicas tolerate one failure; five tolerate two</p></div>
 <div class="card"><span class="big">5 Vs</span><p>volume, veracity, velocity, variety, value</p></div>
 <div class="card"><span class="big">≈ 70–75%</span><p>sensible sustained utilisation before scaling out</p></div>
